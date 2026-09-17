@@ -613,7 +613,7 @@ footer{background:var(--navy-dark); color:#9FC4E5; padding:36px 0 24px; font-siz
           </div>
         </div>
         <div class="map-frame" id="mapFrame-vigevano">
-          <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=8.8689086,45.3194847,8.8749086,45.3254847&amp;layer=mapnik&amp;marker=45.3224847,8.8719086" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Mappa Venchi Multicenter, Vigevano"></iframe>
+          <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=8.8689086,45.3194847,8.8749086,45.3254847&amp;layer=mapnik&amp;marker=45.3224847,8.8719086" referrerpolicy="no-referrer-when-downgrade" title="Mappa Venchi Multicenter, Vigevano"></iframe>
         </div>
       </div>
     </div>
@@ -633,7 +633,7 @@ footer{background:var(--navy-dark); color:#9FC4E5; padding:36px 0 24px; font-siz
           </div>
         </div>
         <div class="map-frame" id="mapFrame-mortara">
-          <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=8.7349293,45.248456,8.7409293,45.254456&amp;layer=mapnik&amp;marker=45.251456,8.7379293" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Mappa Venchi Multicenter, Mortara"></iframe>
+          <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=8.7349293,45.248456,8.7409293,45.254456&amp;layer=mapnik&amp;marker=45.251456,8.7379293" referrerpolicy="no-referrer-when-downgrade" title="Mappa Venchi Multicenter, Mortara"></iframe>
         </div>
       </div>
     </div>
@@ -787,7 +787,7 @@ footer{background:var(--navy-dark); color:#9FC4E5; padding:36px 0 24px; font-siz
       if(!loaded){
         frame.innerHTML = '<div class="map-consent"><p>La mappa non si è caricata in questo browser.</p><a class="btn btn-sm" href="'+fallbackLinks[store]+'" target="_blank" rel="noopener">Apri in Google Maps &rarr;</a></div>';
       }
-    }, 5000);
+    }, 10000);
   });
 })();
 
