@@ -318,6 +318,7 @@ footer{background:var(--navy-dark); color:#9FC4E5; padding:36px 0 24px; font-siz
 .offer-card{background:var(--white); border:1px solid var(--line); border-left:6px solid var(--yellow); border-radius:8px; padding:24px 26px; display:flex; flex-direction:column; gap:14px; box-shadow:0 8px 24px rgba(10,61,120,0.07);}
 .offer-top{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;}
 .offer-badge{background:var(--navy); color:var(--white); font-size:12.5px; font-weight:700; padding:5px 12px; border-radius:20px; text-transform:uppercase; letter-spacing:0.03em;}
+.offer-count, #promoBar .pb-count{font-variant-numeric:tabular-nums;}
 .offer-count{font-size:13px; font-weight:700; color:#B45309; background:#FEF3C7; padding:5px 12px; border-radius:20px;}
 .offer-title{font-size:26px; color:var(--ink);}
 .offer-sub{color:var(--gray); font-size:15px; margin-top:-8px;}
@@ -924,6 +925,40 @@ footer{background:var(--navy-dark); color:#9FC4E5; padding:36px 0 24px; font-siz
   }
   function giorniTra(a,b){ return Math.round((Date.parse(b+'T00:00:00Z')-Date.parse(a+'T00:00:00Z'))/86400000); }
   function dataIt(iso){ var p=iso.split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
+  // Istante esatto di fine offerta: 23:59:59 del giorno di scadenza, ora italiana
+  function fineOfferta(scad){
+    var guess = Date.parse(scad+'T23:59:59Z');
+    var off = 2; // ora legale di default
+    try {
+      var tz = new Intl.DateTimeFormat('en-US',{timeZone:'Europe/Rome',timeZoneName:'shortOffset'}).formatToParts(new Date(guess))
+        .filter(function(x){return x.type==='timeZoneName';})[0].value; // es. "GMT+2"
+      var m = tz.match(/GMT([+-]\d+)/); if(m) off = parseInt(m[1],10);
+    } catch(e){ var mo=+scad.slice(5,7); off = (mo>=4 && mo<=10) ? 2 : 1; }
+    return guess - off*3600000;
+  }
+  function due(n){ return (n<10?'0':'')+n; }
+  function orologio(ms){
+    if(ms<=0) return 'Offerta scaduta';
+    var t=Math.floor(ms/1000), g=Math.floor(t/86400), h=Math.floor(t%86400/3600), m=Math.floor(t%3600/60), sec=t%60;
+    return 'Scade tra ' + (g>0 ? g + (g===1?' giorno ':' giorni ') : '') + due(h)+':'+due(m)+':'+due(sec);
+  }
+  var timers = [];
+  function tick(){
+    var now = Date.now(), scaduta = false;
+    timers.forEach(function(t){
+      var left = t.fine - now;
+      t.el.textContent = orologio(left) + (t.suffix||'');
+      if(left<=0) scaduta = true;
+    });
+    if(scaduta){ // allo scoccare della scadenza l'offerta sparisce anche a pagina aperta
+      clearInterval(window.__offerTimer);
+      document.getElementById('promoBar').classList.remove('show');
+      var box=document.getElementById('offerte'); box.classList.remove('show'); box.innerHTML='';
+      timers = [];
+      if(window.__offerData){ render(window.__offerData); if(timers.length){ window.__offerTimer = setInterval(tick, 1000); } }
+    }
+  }
+
   function countdown(scad, oggi){
     var g=giorniTra(oggi,scad);
     if(g<=0) return "Scade oggi";
@@ -934,7 +969,7 @@ footer{background:var(--navy-dark); color:#9FC4E5; padding:36px 0 24px; font-siz
     if(!o || o.attiva===false || !o.scadenza || !o.prezzo) return false;
     if(!/^\d{4}-\d{2}-\d{2}$/.test(o.scadenza)) return false;
     if(o.inizio && oggi < o.inizio) return false;
-    return oggi <= o.scadenza;
+    return oggi <= o.scadenza && Date.now() < fineOfferta(o.scadenza);
   }
 
   function card(o, oggi){
@@ -956,7 +991,7 @@ footer{background:var(--navy-dark); color:#9FC4E5; padding:36px 0 24px; font-siz
       return '<a class="'+w.cls+'" href="https://wa.me/'+w.num+'?text='+encodeURIComponent(msg)+'" target="_blank" rel="noopener">'+w.label+'</a>';
     }).join('');
     return '<div class="offer-card">'
-      + '<div class="offer-top"><span class="offer-badge">'+esc(o.etichetta||'Offerta a tempo')+'</span><span class="offer-count">'+esc(countdown(o.scadenza,oggi))+' &middot; fino al '+scadIt+'</span></div>'
+      + '<div class="offer-top"><span class="offer-badge">'+esc(o.etichetta||'Offerta a tempo')+'</span><span class="offer-count" data-fine="'+fineOfferta(o.scadenza)+'" data-suffix=" · fino al '+scadIt+'">'+esc(countdown(o.scadenza,oggi))+' &middot; fino al '+scadIt+'</span></div>'
       + '<h3 class="offer-title">'+esc(o.titolo||'')+'</h3>'
       + (o.clienti ? '<div class="offer-sub">'+esc(o.clienti)+'</div>' : '')
       + '<div class="offer-price"><span class="num">'+esc(o.prezzo)+'</span><span class="unit">'+esc(o.unita||'')+'</span></div>'
@@ -975,6 +1010,9 @@ footer{background:var(--navy-dark); color:#9FC4E5; padding:36px 0 24px; font-siz
     var box = document.getElementById('offerte');
     box.innerHTML = '<div class="offer-grid">' + list.map(function(o){ return card(o, oggi); }).join('') + '</div>';
     box.classList.add('show');
+    [].forEach.call(box.querySelectorAll('.offer-count[data-fine]'), function(el){
+      timers.push({el:el, fine:+el.getAttribute('data-fine'), suffix:el.getAttribute('data-suffix')});
+    });
 
     var b = list.filter(function(o){ return o.banner; })[0];
     if(b){
@@ -982,7 +1020,9 @@ footer{background:var(--navy-dark); color:#9FC4E5; padding:36px 0 24px; font-siz
       try { chiusa = sessionStorage.getItem(key)==='1'; } catch(e){}
       if(!chiusa){
         document.getElementById('pbText').textContent = b.banner;
-        document.getElementById('pbCount').textContent = countdown(b.scadenza, oggi);
+        var pbc = document.getElementById('pbCount');
+        pbc.textContent = countdown(b.scadenza, oggi);
+        timers.push({el:pbc, fine:fineOfferta(b.scadenza), suffix:''});
         var bar = document.getElementById('promoBar');
         bar.classList.add('show');
         document.getElementById('pbClose').addEventListener('click', function(){
@@ -1003,7 +1043,10 @@ footer{background:var(--navy-dark); color:#9FC4E5; padding:36px 0 24px; font-siz
 
   fetch(OFFERTE_URL, {cache:'no-store'})
     .then(function(r){ if(!r.ok) throw new Error('no offerte'); return r.json(); })
-    .then(function(d){ setTimeout(function(){ render(d); }, 400); })
+    .then(function(d){ setTimeout(function(){
+      window.__offerData = d; render(d);
+      if(timers.length){ tick(); window.__offerTimer = setInterval(tick, 1000); }
+    }, 400); })
     .catch(function(){ /* nessuna offerta disponibile: non si mostra nulla */ });
 })();
 </script>
