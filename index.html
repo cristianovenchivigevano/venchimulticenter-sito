@@ -303,6 +303,34 @@ footer{background:var(--navy-dark); color:#9FC4E5; padding:36px 0 24px; font-siz
   .icon-grid{grid-template-columns:1fr 1fr;}
 }
 
+
+/* ===== Offerte a tempo (caricate da offerte.json) ===== */
+#promoBar{display:none; background:var(--yellow); color:var(--navy-dark);}
+#promoBar.show{display:block;}
+#promoBar .wrap{display:flex; align-items:center; justify-content:center; gap:10px 16px; flex-wrap:wrap; padding-top:9px; padding-bottom:9px; text-align:center; position:relative; padding-right:44px;}
+#promoBar .pb-text{font-weight:700; font-size:15px;}
+#promoBar .pb-count{font-size:13px; font-weight:600; background:var(--navy-dark); color:var(--yellow); padding:3px 10px; border-radius:20px; white-space:nowrap;}
+#promoBar .pb-link{font-family:'Big Shoulders Display',sans-serif; font-weight:700; font-size:16px; text-decoration:underline; text-underline-offset:3px; white-space:nowrap;}
+#promoBar .pb-close{position:absolute; right:14px; top:50%; transform:translateY(-50%); background:none; border:0; font-size:22px; line-height:1; cursor:pointer; color:var(--navy-dark); padding:4px 6px;}
+#offerte{display:none; margin-top:28px; scroll-margin-top:110px;}
+#offerte.show{display:block;}
+.offer-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:18px;}
+.offer-card{background:var(--white); border:1px solid var(--line); border-left:6px solid var(--yellow); border-radius:8px; padding:24px 26px; display:flex; flex-direction:column; gap:14px; box-shadow:0 8px 24px rgba(10,61,120,0.07);}
+.offer-top{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;}
+.offer-badge{background:var(--navy); color:var(--white); font-size:12.5px; font-weight:700; padding:5px 12px; border-radius:20px; text-transform:uppercase; letter-spacing:0.03em;}
+.offer-count{font-size:13px; font-weight:700; color:#B45309; background:#FEF3C7; padding:5px 12px; border-radius:20px;}
+.offer-title{font-size:26px; color:var(--ink);}
+.offer-sub{color:var(--gray); font-size:15px; margin-top:-8px;}
+.offer-price{display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;}
+.offer-price .num{font-family:'Big Shoulders Display',sans-serif; font-weight:800; font-size:58px; line-height:1; color:var(--navy);}
+.offer-price .unit{font-weight:700; font-size:18px; color:var(--navy);}
+.offer-compare{font-size:14px; color:var(--ink); background:var(--paper); border-radius:6px; padding:9px 12px;}
+.offer-list{list-style:none; display:flex; flex-direction:column; gap:6px; font-size:15px;}
+.offer-list li{padding-left:22px; position:relative;}
+.offer-list li::before{content:"\2713"; position:absolute; left:0; color:#0A8A4A; font-weight:700;}
+.offer-actions{display:flex; gap:10px; flex-wrap:wrap;}
+.offer-note{font-size:12px; color:var(--gray); line-height:1.5; border-top:1px solid var(--line); padding-top:12px;}
+@media (max-width:640px){ .offer-card{padding:20px;} .offer-price .num{font-size:48px;} #promoBar .pb-text{font-size:14px;} }
 </style>
 <script type="application/ld+json">
 {
@@ -362,6 +390,15 @@ footer{background:var(--navy-dark); color:#9FC4E5; padding:36px 0 24px; font-siz
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "9f03712ac07f457595e93fcb9ecfd5b1"}'></script><!-- End Cloudflare Web Analytics -->
 </head>
 <body>
+
+<div id="promoBar" role="region" aria-label="Offerta a tempo">
+  <div class="wrap">
+    <span class="pb-text" id="pbText"></span>
+    <span class="pb-count" id="pbCount"></span>
+    <a class="pb-link" href="#offerte">Scopri l'offerta &rarr;</a>
+    <button class="pb-close" type="button" aria-label="Chiudi" id="pbClose">&times;</button>
+  </div>
+</div>
 
 <header>
   <div class="wrap">
@@ -436,6 +473,8 @@ footer{background:var(--navy-dark); color:#9FC4E5; padding:36px 0 24px; font-siz
       </div>
     </div>
     <div class="market-source" id="marketSource">Fonte: GME &ndash; Gestore dei Mercati Energetici (<a href="https://www.mercatoelettrico.org" target="_blank" rel="noopener">mercatoelettrico.org</a>). Aggiornato al 14/09/2026.</div>
+
+    <div id="offerte" aria-live="polite"></div>
 
     <div class="market-cta">
       <div class="market-cta-text">
@@ -835,7 +874,7 @@ footer{background:var(--navy-dark); color:#9FC4E5; padding:36px 0 24px; font-siz
 
   fetch(DATA_URL, {cache: 'no-store'})
     .then(function(res){ if(!res.ok) throw new Error('no data'); return res.json(); })
-    .then(function(data){ renderCards(data); })
+    .then(function(data){ renderCards(data); try{ document.dispatchEvent(new Event('punpsv:aggiornati')); }catch(e){} })
     .catch(function(){ /* servizio non ancora collegato: restano i valori statici */ });
 })();
 /* ---------- Aperto ora / Chiuso ora ---------- */
@@ -865,5 +904,108 @@ footer{background:var(--navy-dark); color:#9FC4E5; padding:36px 0 24px; font-siz
 })();
 </script>
 
+<script>
+/* ---------- Offerte a tempo: lette da offerte.json su GitHub ----------
+   Per cambiare o togliere un'offerta si modifica SOLO offerte.json nel
+   repository venchi-pun-psv: questo file non va toccato.
+   Un'offerta si vede fino alle 23:59 del giorno "scadenza" (ora italiana),
+   poi sparisce da sola. Se il file non e' raggiungibile non si vede nulla. */
+(function(){
+  var OFFERTE_URL = "https://cristianovenchivigevano.github.io/venchi-pun-psv/offerte.json";
+  var WA = [
+    {label:"WhatsApp Vigevano", num:"39038172066", cls:"btn"},
+    {label:"WhatsApp Mortara",  num:"390384090219", cls:"btn btn-blue"}
+  ];
+
+  function esc(v){ return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function oggiRoma(){
+    try { return new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Rome'}); }
+    catch(e){ var d=new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
+  }
+  function giorniTra(a,b){ return Math.round((Date.parse(b+'T00:00:00Z')-Date.parse(a+'T00:00:00Z'))/86400000); }
+  function dataIt(iso){ var p=iso.split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
+  function countdown(scad, oggi){
+    var g=giorniTra(oggi,scad);
+    if(g<=0) return "Scade oggi";
+    if(g===1) return "Scade domani";
+    return "Ancora " + g + " giorni";
+  }
+  function attiva(o, oggi){
+    if(!o || o.attiva===false || !o.scadenza || !o.prezzo) return false;
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(o.scadenza)) return false;
+    if(o.inizio && oggi < o.inizio) return false;
+    return oggi <= o.scadenza;
+  }
+
+  function card(o, oggi){
+    var scadIt = dataIt(o.scadenza);
+    var msg = o.messaggio_whatsapp || ("Ciao! Ho visto sul sito l'offerta " + (o.titolo||'') + " a " + o.prezzo + " " + (o.unita||'') + " valida fino al " + scadIt + ". Vorrei attivarla.");
+    var list = (o.dettagli||[]).filter(Boolean).map(function(d){ return '<li>'+esc(d)+'</li>'; }).join('');
+    if(o.durata) list = '<li>Prezzo bloccato per ' + esc(o.durata) + '</li>' + list;
+    if(o.fornitore) list += '<li>Fornitore: ' + esc(o.fornitore) + '</li>';
+    var cmp = '';
+    if(o.confronto_pun && (o.tipo||'luce')==='luce'){
+      var pun = document.getElementById('punOggi');
+      if(pun && pun.textContent) cmp = '<div class="offer-compare">Per confronto, PUN di oggi (prezzo all\'ingrosso): <strong><span data-live="punOggi">' + esc(pun.textContent) + '</span> &euro;/kWh</strong></div>';
+    }
+    if(o.confronto_psv && o.tipo==='gas'){
+      var psv = document.getElementById('psvOggi');
+      if(psv && psv.textContent) cmp = '<div class="offer-compare">Per confronto, PSV di oggi (prezzo all\'ingrosso): <strong><span data-live="psvOggi">' + esc(psv.textContent) + '</span> &euro;/Smc</strong></div>';
+    }
+    var btns = WA.map(function(w){
+      return '<a class="'+w.cls+'" href="https://wa.me/'+w.num+'?text='+encodeURIComponent(msg)+'" target="_blank" rel="noopener">'+w.label+'</a>';
+    }).join('');
+    return '<div class="offer-card">'
+      + '<div class="offer-top"><span class="offer-badge">'+esc(o.etichetta||'Offerta a tempo')+'</span><span class="offer-count">'+esc(countdown(o.scadenza,oggi))+' &middot; fino al '+scadIt+'</span></div>'
+      + '<h3 class="offer-title">'+esc(o.titolo||'')+'</h3>'
+      + (o.clienti ? '<div class="offer-sub">'+esc(o.clienti)+'</div>' : '')
+      + '<div class="offer-price"><span class="num">'+esc(o.prezzo)+'</span><span class="unit">'+esc(o.unita||'')+'</span></div>'
+      + cmp
+      + (list ? '<ul class="offer-list">'+list+'</ul>' : '')
+      + '<div class="offer-actions">'+btns+'</div>'
+      + (o.nota ? '<div class="offer-note">'+esc(o.nota)+'</div>' : '')
+      + '</div>';
+  }
+
+  function render(data){
+    var oggi = oggiRoma();
+    var list = ((data && data.offerte) || []).filter(function(o){ return attiva(o, oggi); });
+    if(!list.length) return;
+
+    var box = document.getElementById('offerte');
+    box.innerHTML = '<div class="offer-grid">' + list.map(function(o){ return card(o, oggi); }).join('') + '</div>';
+    box.classList.add('show');
+
+    var b = list.filter(function(o){ return o.banner; })[0];
+    if(b){
+      var key = 'promoChiusa:' + b.banner + b.scadenza, chiusa = false;
+      try { chiusa = sessionStorage.getItem(key)==='1'; } catch(e){}
+      if(!chiusa){
+        document.getElementById('pbText').textContent = b.banner;
+        document.getElementById('pbCount').textContent = countdown(b.scadenza, oggi);
+        var bar = document.getElementById('promoBar');
+        bar.classList.add('show');
+        document.getElementById('pbClose').addEventListener('click', function(){
+          bar.classList.remove('show');
+          try { sessionStorage.setItem(key,'1'); } catch(e){}
+        });
+      }
+    }
+  }
+
+  // quando arrivano i valori PUN/PSV aggiornati, aggiorna anche il confronto nelle schede
+  document.addEventListener('punpsv:aggiornati', function(){
+    [].forEach.call(document.querySelectorAll('[data-live]'), function(el){
+      var src = document.getElementById(el.getAttribute('data-live'));
+      if(src) el.textContent = src.textContent;
+    });
+  });
+
+  fetch(OFFERTE_URL, {cache:'no-store'})
+    .then(function(r){ if(!r.ok) throw new Error('no offerte'); return r.json(); })
+    .then(function(d){ setTimeout(function(){ render(d); }, 400); })
+    .catch(function(){ /* nessuna offerta disponibile: non si mostra nulla */ });
+})();
+</script>
 </body>
 </html>
