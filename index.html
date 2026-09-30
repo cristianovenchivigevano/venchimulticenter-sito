@@ -474,7 +474,7 @@ footer{background:var(--navy-dark); color:#9FC4E5; padding:36px 0 24px; font-siz
         <svg id="marketChart" viewBox="0 0 400 110" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"></svg>
       </div>
     </div>
-    <div class="market-source" id="marketSource">Fonte: GME &ndash; Gestore dei Mercati Energetici (<a href="https://www.mercatoelettrico.org" target="_blank" rel="noopener">mercatoelettrico.org</a>). Aggiornato al 14/09/2026.</div>
+    <div class="market-source" id="marketSource">Fonte: elaborazione su dati GME &ndash; Gestore dei Mercati Energetici (<a href="https://www.mercatoelettrico.org" target="_blank" rel="noopener">mercatoelettrico.org</a>), tramite <a href="https://www.a4energie.it" target="_blank" rel="noopener">A4Energie.it</a> e <a href="https://bolletta-energia.it" target="_blank" rel="noopener">bolletta-energia.it</a>. Aggiornato al 14/09/2026.</div>
 
     <div id="offerte" aria-live="polite"></div>
 
@@ -868,7 +868,7 @@ footer{background:var(--navy-dark); color:#9FC4E5; padding:36px 0 24px; font-siz
     document.getElementById('psvMensile').textContent = data.psv.mensile.toFixed(5).replace('.', ',');
     document.getElementById('punDelta').innerHTML = '<strong>' + (data.pun.deltaPct>=0?'+':'') + data.pun.deltaPct.toFixed(1).replace('.', ',') + '%</strong> vs il mese prima ancora';
     document.getElementById('psvDelta').innerHTML = '<strong>' + (data.psv.deltaPct>=0?'+':'') + data.psv.deltaPct.toFixed(1).replace('.', ',') + '%</strong> vs il mese prima ancora';
-    document.getElementById('marketSource').innerHTML = 'Fonte: GME &ndash; Gestore dei Mercati Energetici (<a href="https://www.mercatoelettrico.org" target="_blank" rel="noopener">mercatoelettrico.org</a>). Aggiornato al ' + data.updated + '.';
+    document.getElementById('marketSource').innerHTML = 'Fonte: elaborazione su dati GME &ndash; Gestore dei Mercati Energetici (<a href="https://www.mercatoelettrico.org" target="_blank" rel="noopener">mercatoelettrico.org</a>), tramite <a href="https://www.a4energie.it" target="_blank" rel="noopener">A4Energie.it</a> e <a href="https://bolletta-energia.it" target="_blank" rel="noopener">bolletta-energia.it</a>. Aggiornato al ' + data.updated + '.';
     if(data.months){ renderChart(data.months); }
   }
 
