@@ -341,7 +341,6 @@ footer{background:var(--navy-dark); color:#9FC4E5; padding:36px 0 24px; font-siz
       "@type": "LocalBusiness",
       "@id": "https://www.venchimulticenter.it/#vigevano",
       "name": "Venchi Multicenter Vigevano",
-      "image": "https://www.venchimulticenter.it/logo.png",
       "telephone": "+39 0381 72066",
       "priceRange": "€€",
       "address": {
@@ -353,9 +352,8 @@ footer{background:var(--navy-dark); color:#9FC4E5; padding:36px 0 24px; font-siz
         "addressCountry": "IT"
       },
       "openingHoursSpecification": [
-        {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "09:30", "closes": "12:30"},
-        {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "15:30", "closes": "19:00"},
-        {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "09:30", "closes": "12:30"}
+        {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "09:30", "closes": "12:30"},
+        {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "15:30", "closes": "19:00"}
       ],
       "parentOrganization": {"@type": "Organization", "name": "Venchi Multicenter SAS", "taxID": "01891920181"},
       "url": "https://www.venchimulticenter.it/",
@@ -365,7 +363,6 @@ footer{background:var(--navy-dark); color:#9FC4E5; padding:36px 0 24px; font-siz
       "@type": "LocalBusiness",
       "@id": "https://www.venchimulticenter.it/#mortara",
       "name": "Venchi Multicenter Mortara",
-      "image": "https://www.venchimulticenter.it/logo.png",
       "telephone": "+39 0384 090219",
       "priceRange": "€€",
       "address": {
@@ -377,9 +374,8 @@ footer{background:var(--navy-dark); color:#9FC4E5; padding:36px 0 24px; font-siz
         "addressCountry": "IT"
       },
       "openingHoursSpecification": [
-        {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "09:30", "closes": "12:30"},
-        {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "15:30", "closes": "19:00"},
-        {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "09:30", "closes": "12:30"}
+        {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "09:30", "closes": "12:30"},
+        {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "15:00", "closes": "19:00"}
       ],
       "parentOrganization": {"@type": "Organization", "name": "Venchi Multicenter SAS", "taxID": "01891920181"},
       "url": "https://www.venchimulticenter.it/"
@@ -647,8 +643,7 @@ footer{background:var(--navy-dark); color:#9FC4E5; padding:36px 0 24px; font-siz
           <div class="store-detail"><div class="label">Telefono e WhatsApp</div><a class="value" href="tel:+39038172066">0381 72066</a></div>
           <div class="store-detail"><div class="label">Orari di apertura <span class="open-status" id="statusVigevano"><span class="dot"></span><span class="txt">&nbsp;</span></span></div>
             <table class="hours-table">
-              <tr><td>Lunedi &ndash; Venerdi</td><td>9:30 &ndash; 12:30, 15:30 &ndash; 19:00</td></tr>
-              <tr><td>Sabato</td><td>9:30 &ndash; 12:30</td></tr>
+              <tr><td>Luned&igrave; &ndash; Sabato</td><td>9:30 &ndash; 12:30, 15:30 &ndash; 19:00</td></tr>
               <tr><td>Domenica</td><td>Chiuso</td></tr>
             </table>
           </div>
@@ -667,8 +662,8 @@ footer{background:var(--navy-dark); color:#9FC4E5; padding:36px 0 24px; font-siz
           <div class="store-detail"><div class="label">Telefono e WhatsApp</div><a class="value" href="tel:+390384090219">0384 090219</a></div>
           <div class="store-detail"><div class="label">Orari di apertura <span class="open-status" id="statusMortara"><span class="dot"></span><span class="txt">&nbsp;</span></span></div>
             <table class="hours-table">
-              <tr><td>Lunedi &ndash; Venerdi</td><td>9:30 &ndash; 12:30, 15:30 &ndash; 19:00</td></tr>
-              <tr><td>Sabato</td><td>9:30 &ndash; 12:30</td></tr>
+              <tr><td>Luned&igrave;</td><td>15:00 &ndash; 19:00</td></tr>
+              <tr><td>Marted&igrave; &ndash; Sabato</td><td>9:30 &ndash; 12:30, 15:00 &ndash; 19:00</td></tr>
               <tr><td>Domenica</td><td>Chiuso</td></tr>
             </table>
           </div>
@@ -879,29 +874,46 @@ footer{background:var(--navy-dark); color:#9FC4E5; padding:36px 0 24px; font-siz
     .then(function(data){ renderCards(data); try{ document.dispatchEvent(new Event('punpsv:aggiornati')); }catch(e){} })
     .catch(function(){ /* servizio non ancora collegato: restano i valori statici */ });
 })();
-/* ---------- Aperto ora / Chiuso ora ---------- */
+/* ---------- Aperto ora / Chiuso ora (ora italiana, festivi chiusi) ---------- */
 (function(){
-  // Stessi orari per entrambe le sedi: Lun-Ven 9:30-12:30 e 15:30-19:00, Sab 9:30-12:30, Dom chiuso
-  var hours = {
-    1: [[9.5,12.5],[15.5,19]], 2: [[9.5,12.5],[15.5,19]], 3: [[9.5,12.5],[15.5,19]],
-    4: [[9.5,12.5],[15.5,19]], 5: [[9.5,12.5],[15.5,19]], 6: [[9.5,12.5]], 0: []
-  };
-  function isOpenNow(){
-    var now = new Date();
-    var day = now.getDay();
-    var t = now.getHours() + now.getMinutes()/60;
-    var ranges = hours[day] || [];
-    for (var i=0; i<ranges.length; i++){
-      if (t >= ranges[i][0] && t < ranges[i][1]) return true;
+  // Orari per sede: giorno (0=domenica ... 6=sabato) -> fasce [apertura, chiusura] in ore decimali
+  var HOURS = {
+    statusVigevano: { // Lun-Sab 9:30-12:30 e 15:30-19:00, Dom chiuso
+      1:[[9.5,12.5],[15.5,19]], 2:[[9.5,12.5],[15.5,19]], 3:[[9.5,12.5],[15.5,19]],
+      4:[[9.5,12.5],[15.5,19]], 5:[[9.5,12.5],[15.5,19]], 6:[[9.5,12.5],[15.5,19]], 0:[]
+    },
+    statusMortara: { // Lun 15:00-19:00, Mar-Sab 9:30-12:30 e 15:00-19:00, Dom chiuso
+      1:[[15,19]], 2:[[9.5,12.5],[15,19]], 3:[[9.5,12.5],[15,19]],
+      4:[[9.5,12.5],[15,19]], 5:[[9.5,12.5],[15,19]], 6:[[9.5,12.5],[15,19]], 0:[]
     }
-    return false;
+  };
+  // Festivita' nazionali fisse (MM-DD); Pasqua e Pasquetta calcolate
+  var FESTIVI = ['01-01','01-06','04-25','05-01','06-02','08-15','11-01','12-08','12-25','12-26'];
+  function pasqua(y){ var a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),da=((h+l-7*m+114)%31)+1; return new Date(Date.UTC(y,mo-1,da)); }
+  function two(n){ return (n<10?'0':'')+n; }
+  function oraRoma(){
+    var d=new Date(), p={};
+    try {
+      new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',weekday:'short',hour12:false})
+        .formatToParts(d).forEach(function(x){ p[x.type]=x.value; });
+      var wd={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6}[p.weekday];
+      return {y:+p.year, mm:p.month, dd:p.day, day:wd, t:(+p.hour%24)+(+p.minute)/60};
+    } catch(e){ return {y:d.getFullYear(), mm:two(d.getMonth()+1), dd:two(d.getDate()), day:d.getDay(), t:d.getHours()+d.getMinutes()/60}; }
   }
-  var open = isOpenNow();
-  ['statusVigevano','statusMortara'].forEach(function(id){
+  function festivo(r){
+    if(FESTIVI.indexOf(r.mm+'-'+r.dd)>-1) return true;
+    var e=pasqua(r.y), lun=new Date(e.getTime()+86400000);
+    var md=function(x){ return two(x.getUTCMonth()+1)+'-'+two(x.getUTCDate()); };
+    return (r.mm+'-'+r.dd)===md(e) || (r.mm+'-'+r.dd)===md(lun);
+  }
+  var r = oraRoma(), chiusoFestivo = festivo(r);
+  Object.keys(HOURS).forEach(function(id){
     var el = document.getElementById(id);
     if(!el) return;
+    var open = false, ranges = chiusoFestivo ? [] : (HOURS[id][r.day] || []);
+    for (var i=0; i<ranges.length; i++){ if (r.t >= ranges[i][0] && r.t < ranges[i][1]) open = true; }
     el.classList.add(open ? 'is-open' : 'is-closed');
-    el.querySelector('.txt').textContent = open ? 'Aperto ora' : 'Chiuso ora';
+    el.querySelector('.txt').textContent = open ? 'Aperto ora' : (chiusoFestivo ? 'Chiuso (festivo)' : 'Chiuso ora');
   });
 })();
 </script>
