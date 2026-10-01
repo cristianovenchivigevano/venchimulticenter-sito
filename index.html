@@ -325,6 +325,8 @@ footer{background:var(--navy-dark); color:#9FC4E5; padding:36px 0 24px; font-siz
 .offer-price{display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;}
 .offer-price .num{font-family:'Big Shoulders Display',sans-serif; font-weight:800; font-size:58px; line-height:1; color:var(--navy);}
 .offer-price .unit{font-weight:700; font-size:18px; color:var(--navy);}
+.offer-sconto{align-self:center; margin-left:8px; background:#D7262E; color:#fff; font-family:'Big Shoulders Display',sans-serif; font-weight:800; font-size:26px; line-height:1; padding:7px 12px; border-radius:6px; transform:rotate(-3deg); box-shadow:0 4px 10px rgba(215,38,46,.25);}
+.offer-sconto-txt{font-size:13.5px; font-weight:700; color:#D7262E; margin-top:-6px;}
 .offer-compare{font-size:14px; color:var(--ink); background:var(--paper); border-radius:6px; padding:9px 12px;}
 .offer-list{list-style:none; display:flex; flex-direction:column; gap:6px; font-size:15px;}
 .offer-list li{padding-left:22px; position:relative;}
@@ -1007,7 +1009,9 @@ footer{background:var(--navy-dark); color:#9FC4E5; padding:36px 0 24px; font-siz
       + '<div class="offer-top"><span class="offer-badge">'+esc(o.etichetta||'Offerta a tempo')+'</span><span class="offer-count" data-fine="'+fineOfferta(o.scadenza)+'" data-suffix=" · fino al '+scadIt+'">'+esc(countdown(o.scadenza,oggi))+' &middot; fino al '+scadIt+'</span></div>'
       + '<h3 class="offer-title">'+esc(o.titolo||'')+'</h3>'
       + (o.clienti ? '<div class="offer-sub">'+esc(o.clienti)+'</div>' : '')
-      + '<div class="offer-price"><span class="num">'+esc(o.prezzo)+'</span><span class="unit">'+esc(o.unita||'')+'</span></div>'
+      + '<div class="offer-price"><span class="num">'+esc(o.prezzo)+'</span><span class="unit">'+esc(o.unita||'')+'</span>'
+      + (o.sconto ? '<span class="offer-sconto">'+esc(o.sconto)+'</span>' : '') + '</div>'
+      + (o.sconto_testo ? '<div class="offer-sconto-txt">'+esc(o.sconto_testo)+'</div>' : '')
       + cmp
       + (list ? '<ul class="offer-list">'+list+'</ul>' : '')
       + '<div class="offer-actions">'+btns+'</div>'
